@@ -12,7 +12,8 @@
             "elm/json": "1.0.0",
             "elm/url": "1.0.0",
             "elm-explorations/linear-algebra": "1.0.3",
-            "mdgriffith/elm-ui": "1.1.0"
+            "mdgriffith/elm-ui": "1.1.0",
+            "rtfeldman/elm-hex": "1.0.0"
         },
         "indirect": {
             "elm/time": "1.0.0",

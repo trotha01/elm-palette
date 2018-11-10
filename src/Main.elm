@@ -62,10 +62,14 @@ type alias Flags =
 
 init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
+    let
+        palette =
+            Palette.default
+    in
     ( { key = key
       , url = url
-      , palette = Palette.default
-      , paletteEditor = Palette.init
+      , palette = palette
+      , paletteEditor = Palette.init palette
       }
     , Cmd.none
     )
@@ -141,11 +145,51 @@ viewHeader =
 
 viewContent : Palette -> Element Msg
 viewContent palette =
-    column []
-        [ row [ width (fillPortion 1) ] [ Components.card palette ]
-        , row [ width (fillPortion 1) ] [ Components.card palette ]
-        , row [ width (fillPortion 1) ] [ Components.card palette ]
+    column [ width fill, spacing palette.spacing, padding palette.padding ]
+        [ viewContentRow1 palette
+        , viewContentRow2 palette
         ]
+
+
+viewContentRow1 : Palette -> Element Msg
+viewContentRow1 palette =
+    row
+        [ width fill
+        , spacing palette.spacing
+        , padding palette.padding
+        ]
+        [ Components.card palette viewCard1
+        , Components.card palette viewCard2
+        , Components.card palette viewCard3
+        ]
+
+
+viewContentRow2 : Palette -> Element Msg
+viewContentRow2 palette =
+    row
+        [ width fill
+        , spacing palette.spacing
+        , padding palette.padding
+        ]
+        [ Components.card palette viewCard1
+        , Components.card palette viewCard2
+        , Components.card palette viewCard3
+        ]
+
+
+viewCard1 : Element Msg
+viewCard1 =
+    el [] (text "Card 1")
+
+
+viewCard2 : Element Msg
+viewCard2 =
+    el [] (text "Card 2")
+
+
+viewCard3 : Element Msg
+viewCard3 =
+    el [] (text "Card 3")
 
 
 viewFooter : Element Msg

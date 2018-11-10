@@ -22,7 +22,7 @@ header palette e =
 
 content : Palette -> Element msg -> Element msg
 content palette e =
-    el [ height fill ] e
+    el [ height fill, width fill ] e
 
 
 footer : Palette -> Element msg -> Element msg
@@ -38,24 +38,14 @@ footer palette e =
         e
 
 
-card : Palette -> Element msg
-card palette =
-    column
-        [ width (px 200)
-        , height (px 300)
+card : Palette -> Element msg -> Element msg
+card palette contents =
+    el
+        [ height (px 100)
+        , width fill -- (fillPortion 3)
+        , padding palette.padding
+        , Background.color (Palette.headerColor palette)
+        , Font.size (Palette.largeFontSize palette)
+        , Font.color (Palette.fontColor (Palette.headerColor palette))
         ]
-        [ el
-            [ height (fillPortion 1 |> minimum 50)
-            , width fill
-            , padding palette.padding
-            , Background.color (Palette.headerColor palette)
-            , Font.size (Palette.largeFontSize palette)
-            , Font.color (Palette.fontColor (Palette.headerColor palette))
-            ]
-            (text "modal header")
-        , el
-            [ height (fillPortion 4 |> minimum 100)
-            , width fill
-            ]
-            (text "modal content")
-        ]
+        contents

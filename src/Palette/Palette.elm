@@ -18,25 +18,27 @@ type alias Palette =
     , headerHeight : Length
     , footerHeight : Length
     , padding : Int
+    , spacing : Int
     }
 
 
 default : Palette
 default =
     { -- Font
-      fontSize = 24
-    , fontRatio = perfectFifth
+      fontSize = 17
+    , fontRatio = 1.5
 
     -- Color
-    , shadowColor = rgb 0 0 0
-    , midtoneColor = rgb 0.6 0.6 0.6
-    , highlightColor = rgb 0.9 0.9 0.9
-    , accentColor = rgb 0 0 0.8
+    , shadowColor = rgba 0 0 0 1
+    , midtoneColor = rgba 0.45098039215686275 0.5019607843137255 0.8 1
+    , highlightColor = rgba 1 1 1 1
+    , accentColor = rgba 0 0 0.7 1
 
     -- Layout
     , headerHeight = px 200
     , footerHeight = px 100
-    , padding = 30
+    , padding = 15
+    , spacing = 31
     }
 
 

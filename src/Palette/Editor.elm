@@ -1,16 +1,22 @@
-module Palette.Editor exposing (Msg(..), PaletteEditor, Position, accentColor, black, codeFromPaletteEditor, decodeMouseMove, fromEditor, init, mousePositionDecoder, paletteCode, subscriptions, update, view, viewFontSizeSelector, viewHeader, viewSaveButton, viewSelectors, white)
+module Palette.Editor exposing (Msg(..), PaletteEditor, Position, black, codeFromPaletteEditor, decodeMouseMove, fontRatioOptions, fromEditor, init, mousePositionDecoder, paletteCode, subscriptions, update, view, viewExpanded, viewFontRatioSelector, viewFontSizeSelector, viewHeader, viewMinimizeButton, viewMinimized, viewPaddingSelector, viewRadio, viewSaveButton, viewSelectors, viewSlider, viewSpacingSelector, white)
 
 import Browser.Events as Events
 import Element exposing (..)
 import Element.Background as Background
 import Element.Border as Border
-import Element.Events exposing (onMouseDown, onMouseUp)
+import Element.Events exposing (onClick, onMouseDown, onMouseUp)
 import Element.Font as Font
 import Element.Input as Input
+import Hex
+import Html
+import Html.Attributes as Attr
+import Html.Events exposing (onInput)
 import Json.Decode as Decode exposing (Decoder)
 import Math.Vector2 as Vec2 exposing (Vec2, vec2)
 import Palette.Helper as Helper
 import Palette.Palette as Palette exposing (Palette)
+import Result
+import String
 import Url
 
 
@@ -21,7 +27,19 @@ import Url
 type alias PaletteEditor =
     { position : Position
     , dragging : Bool
+    , minimized : Bool
+
+    -- Palette Options
     , fontSize : Int
+    , fontRatio : Palette.FontRatio
+    , padding : Int
+    , spacing : Int
+
+    -- color
+    , shadowColor : Color
+    , midtoneColor : Color
+    , highlightColor : Color
+    , accentColor : Color
     }
 
 
@@ -29,11 +47,23 @@ type alias Position =
     Vec2
 
 
-init : PaletteEditor
-init =
+init : Palette -> PaletteEditor
+init palette =
     { position = vec2 0 0
     , dragging = False
-    , fontSize = 24
+    , minimized = True
+
+    -- Palette Options
+    , fontSize = palette.fontSize
+    , fontRatio = palette.fontRatio
+    , padding = palette.padding
+    , spacing = palette.spacing
+
+    -- color
+    , shadowColor = palette.shadowColor
+    , midtoneColor = palette.midtoneColor
+    , highlightColor = palette.highlightColor
+    , accentColor = palette.accentColor
     }
 
 
@@ -41,18 +71,19 @@ fromEditor : PaletteEditor -> Palette
 fromEditor paletteEditor =
     { -- Font
       fontSize = paletteEditor.fontSize
-    , fontRatio = Palette.perfectFifth
+    , fontRatio = paletteEditor.fontRatio
 
     -- Color
-    , shadowColor = rgb 0 0 0
-    , midtoneColor = rgb 0.6 0.6 0.6
-    , highlightColor = rgb 0.9 0.9 0.9
-    , accentColor = rgb 0 0 0.8
+    , shadowColor = paletteEditor.shadowColor
+    , midtoneColor = paletteEditor.midtoneColor
+    , highlightColor = paletteEditor.highlightColor
+    , accentColor = paletteEditor.accentColor
 
     -- Layout
     , headerHeight = px 200
     , footerHeight = px 100
-    , padding = 30
+    , padding = paletteEditor.padding
+    , spacing = paletteEditor.spacing
     }
 
 
@@ -64,8 +95,19 @@ type Msg
     = MouseDown
     | MouseMove Position
     | MouseUp
-    | FontSize Int
+    | Minimize
+    | Maximize
     | Save
+      -- Palette Updates
+    | FontSize Int
+    | FontRatio Float
+    | Padding Int
+    | Spacing Int
+      -- color
+    | ShadowColor Color
+    | MidtoneColor Color
+    | HighlightColor Color
+    | AccentColor Color
 
 
 update : Msg -> PaletteEditor -> PaletteEditor
@@ -80,11 +122,40 @@ update msg model =
         MouseMove position ->
             { model | position = position }
 
-        FontSize fontSize ->
-            { model | fontSize = fontSize }
+        Minimize ->
+            { model | minimized = True }
+
+        Maximize ->
+            { model | minimized = False }
 
         Save ->
             model
+
+        -- Palette Updates
+        FontSize fontSize ->
+            { model | fontSize = fontSize }
+
+        FontRatio fontRatio ->
+            { model | fontRatio = fontRatio }
+
+        Padding padding ->
+            { model | padding = padding }
+
+        Spacing spacing ->
+            { model | spacing = spacing }
+
+        -- color
+        ShadowColor shadowColor ->
+            { model | shadowColor = shadowColor }
+
+        MidtoneColor midtoneColor ->
+            { model | midtoneColor = midtoneColor }
+
+        HighlightColor highlightColor ->
+            { model | highlightColor = highlightColor }
+
+        AccentColor accentColor ->
+            { model | accentColor = accentColor }
 
 
 
@@ -93,6 +164,27 @@ update msg model =
 
 view : PaletteEditor -> Element Msg
 view paletteEditor =
+    if paletteEditor.minimized then
+        viewMinimized paletteEditor
+
+    else
+        viewExpanded paletteEditor
+
+
+viewMinimized : PaletteEditor -> Element Msg
+viewMinimized paletteEditor =
+    el
+        [ width (px 300)
+        , alignBottom
+        , Border.color white
+        , onClick Maximize
+        , Background.color (rgba 1 1 1 0.7)
+        ]
+        (viewHeader paletteEditor)
+
+
+viewExpanded : PaletteEditor -> Element Msg
+viewExpanded paletteEditor =
     el
         [ width (px 300)
         , height (px 400)
@@ -100,35 +192,73 @@ view paletteEditor =
         , moveDown (Vec2.getY paletteEditor.position)
         , scrollbarY
         , Border.color black
-        , Border.glow black 2
-        , Background.color white
+        , Border.shadow { offset = ( 2, 2 ), size = 1, blur = 2, color = rgb 0 0 0 }
+        , Background.color (rgba 1 1 1 0.7)
         ]
         (column []
-            [ viewHeader
+            [ viewHeader paletteEditor
             , viewSelectors paletteEditor
             ]
         )
 
 
-viewHeader : Element Msg
-viewHeader =
-    el
+viewHeader : PaletteEditor -> Element Msg
+viewHeader paletteEditor =
+    let
+        ( contents, cursor ) =
+            if paletteEditor.minimized then
+                ( [ el [] (text "Palette") ]
+                , pointer
+                )
+
+            else
+                ( [ el [] (text "Palette"), viewMinimizeButton ]
+                , htmlAttribute (Attr.style "cursor" "move")
+                )
+    in
+    row
         [ width (px 300)
-        , height (px 50)
-        , Background.color black
+        , height (px 30)
+        , Background.color (rgba 0 0 0 0.7)
         , Font.color white
+        , cursor
 
         -- Event Listeners
         , onMouseDown MouseDown
         , onMouseUp MouseUp
         ]
-        (text "Palette")
+        contents
+
+
+viewMinimizeButton : Element Msg
+viewMinimizeButton =
+    el
+        [ alignRight
+        , width (px 30)
+        , onClick Minimize
+        , pointer
+        ]
+        (text "-")
 
 
 viewSelectors : PaletteEditor -> Element Msg
 viewSelectors paletteEditor =
-    column [ width fill, padding 10, spacing 10 ]
-        [ viewFontSizeSelector paletteEditor
+    column [ width fill, padding 10, spacing 20 ]
+        [ -- font
+          viewFontSizeSelector paletteEditor
+        , viewFontRatioSelector paletteEditor
+
+        -- layout
+        , viewPaddingSelector paletteEditor
+        , viewSpacingSelector paletteEditor
+
+        -- colors
+        , viewShadowColorSelector paletteEditor
+        , viewMidtoneColorSelector paletteEditor
+        , viewHighlightColorSelector paletteEditor
+        , viewAccentColorSelector paletteEditor
+
+        -- save
         , viewSaveButton paletteEditor
         ]
 
@@ -137,8 +267,8 @@ viewSaveButton : PaletteEditor -> Element Msg
 viewSaveButton paletteEditor =
     downloadAs
         [ alignBottom
-        , Background.color accentColor
-        , Font.color (Helper.fontColor accentColor)
+        , Background.color (rgba 0 0 0.5 0.8)
+        , Font.color (Helper.fontColor (rgba 0 0 0.5 0.8))
         , Border.rounded 2
         , padding 10
         ]
@@ -148,28 +278,169 @@ viewSaveButton paletteEditor =
         }
 
 
+viewPaddingSelector : PaletteEditor -> Element Msg
+viewPaddingSelector paletteEditor =
+    let
+        value =
+            toFloat paletteEditor.padding
+
+        label =
+            "Padding: " ++ String.fromInt paletteEditor.padding
+    in
+    viewSlider paletteEditor (round >> Padding) label value
+
+
+viewSpacingSelector : PaletteEditor -> Element Msg
+viewSpacingSelector paletteEditor =
+    let
+        value =
+            toFloat paletteEditor.spacing
+
+        label =
+            "Spacing: " ++ String.fromInt paletteEditor.spacing
+    in
+    viewSlider paletteEditor (round >> Spacing) label value
+
+
 viewFontSizeSelector : PaletteEditor -> Element Msg
 viewFontSizeSelector paletteEditor =
     let
-        currentFontSize =
-            paletteEditor.fontSize
+        value =
+            toFloat paletteEditor.fontSize
 
         label =
-            "Font Size: " ++ String.fromInt currentFontSize
+            "Font Size: " ++ String.fromInt paletteEditor.fontSize
     in
+    viewSlider paletteEditor (round >> FontSize) label value
+
+
+viewFontRatioSelector : PaletteEditor -> Element Msg
+viewFontRatioSelector paletteEditor =
+    viewRadio paletteEditor FontRatio fontRatioOptions (Just paletteEditor.fontRatio) "Font Ratio:"
+
+
+fontRatioOptions : List (Input.Option Float msg)
+fontRatioOptions =
+    [ Input.option 1.5 (el [ width (px 50) ] (text "Perfect Fifth"))
+    , Input.option 1.618 (el [ width (px 50) ] (text "Golden Ratio"))
+    ]
+
+
+viewShadowColorSelector : PaletteEditor -> Element Msg
+viewShadowColorSelector paletteEditor =
+    viewColorSelector paletteEditor ShadowColor "Shadow: " paletteEditor.shadowColor
+
+
+viewMidtoneColorSelector : PaletteEditor -> Element Msg
+viewMidtoneColorSelector paletteEditor =
+    viewColorSelector paletteEditor MidtoneColor "Midtone: " paletteEditor.midtoneColor
+
+
+viewHighlightColorSelector : PaletteEditor -> Element Msg
+viewHighlightColorSelector paletteEditor =
+    viewColorSelector paletteEditor HighlightColor "Highlight: " paletteEditor.highlightColor
+
+
+viewAccentColorSelector : PaletteEditor -> Element Msg
+viewAccentColorSelector paletteEditor =
+    viewColorSelector paletteEditor AccentColor "Accent: " paletteEditor.accentColor
+
+
+viewColorSelector : PaletteEditor -> (Color -> Msg) -> String -> Color -> Element Msg
+viewColorSelector paletteEditor onChange label currentColor =
+    let
+        currentRgb =
+            toRgb currentColor
+    in
+    row []
+        [ text label
+        , Element.html <|
+            Html.input
+                [ Attr.type_ "color"
+                , Attr.value (colorToHex currentColor)
+                , onInput (colorFromHex >> Maybe.withDefault currentColor >> onChange)
+                ]
+                []
+        ]
+
+
+colorFromHex : String -> Maybe Color
+colorFromHex hex =
+    if String.length hex /= 7 then
+        Nothing
+
+    else
+        Maybe.map3 (\r g b -> rgb255 r g b)
+            (String.slice 1 3 hex |> Hex.fromString |> Result.toMaybe)
+            (String.slice 3 5 hex |> Hex.fromString |> Result.toMaybe)
+            (String.slice 5 7 hex |> Hex.fromString |> Result.toMaybe)
+
+
+colorToHex : Color -> String
+colorToHex color =
+    let
+        colorRgb =
+            toRgb color
+    in
+    "#"
+        ++ (fixHex <| Hex.toString <| round <| colorRgb.red * 255)
+        ++ (fixHex <| Hex.toString <| round <| colorRgb.green * 255)
+        ++ (fixHex <| Hex.toString <| round <| colorRgb.blue * 255)
+
+
+colorToCode : Color -> String
+colorToCode color =
+    color
+        |> toRgb
+        |> (\colorRgb ->
+                "rgba "
+                    ++ String.fromFloat colorRgb.red
+                    ++ " "
+                    ++ String.fromFloat colorRgb.green
+                    ++ " "
+                    ++ String.fromFloat colorRgb.blue
+                    ++ " "
+                    ++ String.fromFloat colorRgb.alpha
+           )
+
+
+fixHex : String -> String
+fixHex hex =
+    if String.length hex == 1 then
+        "0" ++ hex
+
+    else
+        hex
+
+
+viewRadio : PaletteEditor -> (option -> Msg) -> List (Input.Option option Msg) -> Maybe option -> String -> Element Msg
+viewRadio paletteEditor onChange options selected label =
+    Input.radio
+        [ padding 10
+        , spacing 20
+        ]
+        { onChange = onChange
+        , options = options
+        , selected = selected
+        , label = Input.labelAbove [] (el [] (text label))
+        }
+
+
+viewSlider : PaletteEditor -> (Float -> Msg) -> String -> Float -> Element Msg
+viewSlider paletteEditor onChange label value =
     Input.slider
-        [ height (px 5)
+        [ height (px 2)
         , width fill
-        , padding 10
+        , padding 1
         , centerY
         , Background.color (rgb 0.5 0.5 0.5)
         , Border.rounded 2
         ]
-        { onChange = round >> FontSize
+        { onChange = onChange
         , label = Input.labelAbove [] (el [] (text label))
         , min = 1
         , max = 100
-        , value = toFloat currentFontSize
+        , value = value
         , thumb = Input.defaultThumb
         , step = Just 1
         }
@@ -181,10 +452,6 @@ black =
 
 white =
     rgb 1 1 1
-
-
-accentColor =
-    rgb 0 0 0.8
 
 
 
@@ -220,6 +487,13 @@ codeFromPaletteEditor : PaletteEditor -> String
 codeFromPaletteEditor paletteEditor =
     paletteCode
         |> String.replace "<FONT_SIZE>" (String.fromInt paletteEditor.fontSize)
+        |> String.replace "<FONT_RATIO>" (String.fromFloat paletteEditor.fontRatio)
+        |> String.replace "<SPACING>" (String.fromInt paletteEditor.spacing)
+        |> String.replace "<PADDING>" (String.fromInt paletteEditor.padding)
+        |> String.replace "<SHADOW_COLOR>" (colorToCode paletteEditor.shadowColor)
+        |> String.replace "<MIDTONE_COLOR>" (colorToCode paletteEditor.midtoneColor)
+        |> String.replace "<HIGHLIGHT_COLOR>" (colorToCode paletteEditor.highlightColor)
+        |> String.replace "<ACCENT_COLOR>" (colorToCode paletteEditor.accentColor)
 
 
 paletteCode =
@@ -243,6 +517,7 @@ type alias Palette =
     , headerHeight : Length
     , footerHeight : Length
     , padding : Int
+    , spacing : Int
     }
 
 
@@ -250,18 +525,19 @@ default : Palette
 default =
     { -- Font
       fontSize = <FONT_SIZE>
-    , fontRatio = perfectFifth
+    , fontRatio = <FONT_RATIO>
 
     -- Color
-    , shadowColor = rgb 0 0 0
-    , midtoneColor = rgb 0.6 0.6 0.6
-    , highlightColor = rgb 0.9 0.9 0.9
-    , accentColor = rgb 0 0 0.8
+    , shadowColor = <SHADOW_COLOR>
+    , midtoneColor = <MIDTONE_COLOR>
+    , highlightColor = <HIGHLIGHT_COLOR>
+    , accentColor = <ACCENT_COLOR>
 
     -- Layout
     , headerHeight = px 200
     , footerHeight = px 100
-    , padding = 30
+    , padding = <PADDING>
+    , spacing = <SPACING>
     }
 
 
