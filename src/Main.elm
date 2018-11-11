@@ -7,6 +7,7 @@ import Browser.Navigation as Nav
 import Components
 import Element exposing (..)
 import Html exposing (Html)
+import Lorem
 import Palette.Editor as Palette exposing (PaletteEditor)
 import Palette.Palette as Palette exposing (Palette)
 import Url

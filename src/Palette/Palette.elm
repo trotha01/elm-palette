@@ -1,4 +1,4 @@
-module Palette.Palette exposing (FontRatio, Palette, default, goldenRatio, perfectFifth)
+module Palette.Palette exposing (..)
 
 import Element exposing (..)
 
@@ -31,8 +31,8 @@ default =
     -- Color
     , shadowColor = rgba 0 0 0 1
     , midtoneColor = rgba 0.45098039215686275 0.5019607843137255 0.8 1
-    , highlightColor = rgba 1 1 1 1
-    , accentColor = rgba 0 0 0.7 1
+    , highlightColor = rgba 0.6745098039215687 0.6 0.8509803921568627 1
+    , accentColor = rgba 0.7019607843137254 0.12941176470588237 0.12941176470588237 1
 
     -- Layout
     , headerHeight = px 200

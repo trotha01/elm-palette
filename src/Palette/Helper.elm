@@ -1,21 +1,7 @@
-module Palette.Helper exposing (black, contrastRatio, fontColor, footerColor, headerColor, largeFontSize, mediumFontSize, relativeLuminance, smallFontSize, threshold, white, xLargeFontSize, xSmallFontSize)
+module Palette.Helper exposing (black, contrastRatio, fontColor, largeFontSize, mediumFontSize, relativeLuminance, smallFontSize, threshold, white, xLargeFontSize, xSmallFontSize)
 
 import Element exposing (..)
 import Palette.Palette as Palette exposing (Palette)
-
-
-
--- LAYOUT
-
-
-headerColor : Palette -> Color
-headerColor palette =
-    palette.midtoneColor
-
-
-footerColor : Palette -> Color
-footerColor palette =
-    palette.shadowColor
 
 
 
@@ -63,20 +49,24 @@ black =
 
 fontColor : Color -> Color
 fontColor backgroundColor =
-    if contrastRatio backgroundColor white >= threshold then
-        black
+    if contrastRatio white backgroundColor >= threshold then
+        white
 
     else
-        white
+        black
 
 
 threshold : Float
 threshold =
-    10
+    1.4
 
 
 {-| contrastRatio
 <https://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef>
+
+max contrast: 21
+min contrast: 1
+
 -}
 contrastRatio : Color -> Color -> Float
 contrastRatio color1 color2 =

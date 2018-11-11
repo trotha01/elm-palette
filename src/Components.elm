@@ -13,9 +13,9 @@ header palette e =
         [ height palette.headerHeight
         , width fill
         , padding palette.padding
-        , Background.color (Palette.headerColor palette)
+        , Background.color palette.highlightColor
         , Font.size (Palette.xLargeFontSize palette)
-        , Font.color (Palette.fontColor (Palette.headerColor palette))
+        , Font.color (Palette.fontColor palette.highlightColor)
         ]
         e
 
@@ -31,9 +31,9 @@ footer palette e =
         [ height palette.footerHeight
         , width fill
         , padding palette.padding
-        , Background.color (Palette.footerColor palette)
+        , Background.color palette.shadowColor
         , Font.size (Palette.smallFontSize palette)
-        , Font.color (Palette.fontColor (Palette.footerColor palette))
+        , Font.color (Palette.fontColor palette.shadowColor)
         ]
         e
 
@@ -42,10 +42,10 @@ card : Palette -> Element msg -> Element msg
 card palette contents =
     el
         [ height (px 100)
-        , width fill -- (fillPortion 3)
+        , width fill
         , padding palette.padding
-        , Background.color (Palette.headerColor palette)
-        , Font.size (Palette.largeFontSize palette)
-        , Font.color (Palette.fontColor (Palette.headerColor palette))
+        , Background.color palette.midtoneColor
+        , Font.size <| Palette.largeFontSize palette
+        , Font.color <| Palette.fontColor palette.midtoneColor
         ]
         contents
