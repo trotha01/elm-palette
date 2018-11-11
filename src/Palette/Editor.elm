@@ -26,6 +26,7 @@ import Url
 
 type alias PaletteEditor =
     { position : Position
+    , dragStart : Maybe Position
     , dragging : Bool
     , minimized : Bool
 
@@ -50,6 +51,7 @@ type alias Position =
 init : Palette -> PaletteEditor
 init palette =
     { position = vec2 0 0
+    , dragStart = Nothing
     , dragging = False
     , minimized = True
 
@@ -117,10 +119,14 @@ update msg model =
             { model | dragging = True }
 
         MouseUp ->
-            { model | dragging = False }
+            { model | dragging = False, dragStart = Nothing }
 
         MouseMove position ->
-            { model | position = position }
+            let
+                dragStart =
+                    model.dragStart |> Maybe.withDefault position
+            in
+            { model | position = updatePosition dragStart position model.position, dragStart = Just position }
 
         Minimize ->
             { model | minimized = True }
@@ -156,6 +162,16 @@ update msg model =
 
         AccentColor accentColor ->
             { model | accentColor = accentColor }
+
+
+updatePosition : Position -> Position -> Position -> Position
+updatePosition dragStart dragEnd position =
+    Vec2.add position (delta dragStart dragEnd)
+
+
+delta : Position -> Position -> Position
+delta pos1 pos2 =
+    Vec2.sub pos2 pos1
 
 
 

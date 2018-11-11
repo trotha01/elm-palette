@@ -136,7 +136,7 @@ view model =
 
 title : String
 title =
-    "Title"
+    "Elm Palette Example"
 
 
 viewHeader : Element Msg
