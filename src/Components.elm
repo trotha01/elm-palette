@@ -1,4 +1,4 @@
-module Components exposing (card, content, footer, header)
+module Components exposing (card, content, footer, h1, h2, header, p)
 
 import Element exposing (..)
 import Element.Background as Background
@@ -14,7 +14,7 @@ header palette e =
         , width fill
         , padding palette.padding
         , Background.color palette.highlightColor
-        , Font.size (Palette.xLargeFontSize palette)
+        , Font.size (Palette.xxLargeFontSize palette)
         , Font.color (Palette.fontColor palette.highlightColor)
         ]
         e
@@ -49,3 +49,28 @@ card palette contents =
         , Font.color <| Palette.fontColor palette.midtoneColor
         ]
         contents
+
+
+h1 : Palette -> String -> Element msg
+h1 palette title =
+    el
+        [ Font.size <| Palette.xLargeFontSize palette
+        ]
+        (text title)
+
+
+h2 : Palette -> String -> Element msg
+h2 palette title =
+    el
+        [ Font.size <| Palette.largeFontSize palette
+        ]
+        (text title)
+
+
+p : Palette -> String -> Element msg
+p palette contents =
+    paragraph
+        [ width fill
+        , Font.size <| Palette.mediumFontSize palette
+        ]
+        [ text contents ]

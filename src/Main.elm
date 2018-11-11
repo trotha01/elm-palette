@@ -149,6 +149,9 @@ viewContent palette =
     column [ width fill, spacing palette.spacing, padding palette.padding ]
         [ viewContentRow1 palette
         , viewContentRow2 palette
+        , viewContentRow3 palette
+        , viewContentRow4 palette
+        , viewContentRow5 palette
         ]
 
 
@@ -175,6 +178,42 @@ viewContentRow2 palette =
         [ Components.card palette viewCard1
         , Components.card palette viewCard2
         , Components.card palette viewCard3
+        ]
+
+
+viewContentRow3 : Palette -> Element Msg
+viewContentRow3 palette =
+    column
+        [ width fill
+        , spacing palette.spacing
+        , padding palette.padding
+        ]
+        [ Components.h1 palette "Title"
+        , Components.p palette (Lorem.sentence 10)
+        ]
+
+
+viewContentRow4 : Palette -> Element Msg
+viewContentRow4 palette =
+    column
+        [ width fill
+        , spacing palette.spacing
+        , padding palette.padding
+        ]
+        [ Components.h2 palette "Sub Title 1"
+        , Components.p palette (Lorem.sentence 50)
+        ]
+
+
+viewContentRow5 : Palette -> Element Msg
+viewContentRow5 palette =
+    column
+        [ width fill
+        , spacing palette.spacing
+        , padding palette.padding
+        ]
+        [ Components.h2 palette "Sub Title 2"
+        , Components.p palette (Lorem.sentence 50)
         ]
 
 

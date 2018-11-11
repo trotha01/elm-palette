@@ -1,4 +1,4 @@
-module Palette.Helper exposing (black, contrastRatio, fontColor, largeFontSize, mediumFontSize, relativeLuminance, smallFontSize, threshold, white, xLargeFontSize, xSmallFontSize)
+module Palette.Helper exposing (FontRatio, black, contrastRatio, fontColor, goldenRatio, largeFontSize, majorSixth, mediumFontSize, perfectFifth, perfectFourth, relativeLuminance, smallFontSize, threshold, white, xLargeFontSize, xSmallFontSize, xxLargeFontSize)
 
 import Element exposing (..)
 import Palette.Palette as Palette exposing (Palette)
@@ -8,29 +8,62 @@ import Palette.Palette as Palette exposing (Palette)
 -- FONT
 
 
+xxLargeFontSize : Palette -> Int
+xxLargeFontSize palette =
+    round <| modular (toFloat palette.fontSize) palette.fontRatio 4
+
+
 xLargeFontSize : Palette -> Int
 xLargeFontSize palette =
-    round <| toFloat palette.fontSize * palette.fontRatio * 2
+    round <| modular (toFloat palette.fontSize) palette.fontRatio 3
 
 
 largeFontSize : Palette -> Int
 largeFontSize palette =
-    round <| toFloat palette.fontSize * palette.fontRatio
+    round <| modular (toFloat palette.fontSize) palette.fontRatio 2
 
 
 mediumFontSize : Palette -> Int
 mediumFontSize palette =
-    round <| toFloat palette.fontSize
+    round <| modular (toFloat palette.fontSize) palette.fontRatio 1
 
 
 smallFontSize : Palette -> Int
 smallFontSize palette =
-    round <| toFloat palette.fontSize / palette.fontRatio
+    round <| modular (toFloat palette.fontSize) palette.fontRatio -1
 
 
 xSmallFontSize : Palette -> Int
 xSmallFontSize palette =
-    round <| toFloat palette.fontSize / (palette.fontRatio * 2)
+    round <| modular (toFloat palette.fontSize) palette.fontRatio -2
+
+
+
+-- ratios
+
+
+type alias FontRatio =
+    Float
+
+
+perfectFifth : FontRatio
+perfectFifth =
+    1.5
+
+
+perfectFourth : FontRatio
+perfectFourth =
+    1.333
+
+
+goldenRatio : FontRatio
+goldenRatio =
+    1.618
+
+
+majorSixth : FontRatio
+majorSixth =
+    1.667
 
 
 

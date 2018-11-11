@@ -31,7 +31,7 @@ type alias PaletteEditor =
 
     -- Palette Options
     , fontSize : Int
-    , fontRatio : Palette.FontRatio
+    , fontRatio : Helper.FontRatio
     , padding : Int
     , spacing : Int
 
@@ -323,8 +323,10 @@ viewFontRatioSelector paletteEditor =
 
 fontRatioOptions : List (Input.Option Float msg)
 fontRatioOptions =
-    [ Input.option 1.5 (el [ width (px 50) ] (text "Perfect Fifth"))
-    , Input.option 1.618 (el [ width (px 50) ] (text "Golden Ratio"))
+    [ Input.option 1.333 (el [ width (px 50) ] (text "Perfect Fourth (3:4)"))
+    , Input.option 1.5 (el [ width (px 50) ] (text "Perfect Fifth (2:3)"))
+    , Input.option 1.618 (el [ width (px 50) ] (text "Golden Ratio (1:1.618)"))
+    , Input.option 1.667 (el [ width (px 50) ] (text "Major Sixth (3:5)"))
     ]
 
 
