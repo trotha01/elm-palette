@@ -11,7 +11,7 @@ $PROJECT_DIR/bin/build
 
 # remove *.js from .gitignore
 # compatible with both GNU and BSD/Mac sed
-sed -i.bak '/\*.js/d' .gitignore
+sed -i.bak '/elm.js/d' .gitignore
 rm .gitignore.bak
 
 echo "ls"
