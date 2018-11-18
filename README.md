@@ -10,7 +10,7 @@ Currently only tested on osx chrome.
 ```
 
 # Live Editor
-Requires (fswatch)[https://github.com/emcrisostomo/fswatch] and (elm-live)[https://github.com/wking-io/elm-live]
+Requires [fswatch](https://github.com/emcrisostomo/fswatch) and [elm-live](https://github.com/wking-io/elm-live)
 
 ```
 ./bin/live
