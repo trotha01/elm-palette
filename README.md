@@ -4,6 +4,9 @@ live.
 
 Currently only tested on osx chrome.
 
+# Live Example
+[elm palette editor example](https://trotha01.github.io/elm-palette/examples/)
+
 # Build
 ```
 ./bin/build
