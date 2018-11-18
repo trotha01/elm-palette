@@ -13,8 +13,8 @@ import Html.Attributes as Attr
 import Html.Events exposing (onInput)
 import Json.Decode as Decode exposing (Decoder)
 import Math.Vector2 as Vec2 exposing (Vec2, vec2)
+import Palette exposing (Palette)
 import Palette.Helper as Helper
-import Palette.Palette as Palette exposing (Palette)
 import Result
 import String
 import Url

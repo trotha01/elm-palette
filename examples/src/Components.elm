@@ -3,8 +3,8 @@ module Components exposing (card, content, footer, h1, h2, header, p)
 import Element exposing (..)
 import Element.Background as Background
 import Element.Font as Font
+import Palette exposing (Palette)
 import Palette.Helper as Palette
-import Palette.Palette as Palette exposing (Palette)
 
 
 header : Palette -> Element msg -> Element msg

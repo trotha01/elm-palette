@@ -6,10 +6,11 @@ import Browser.Events exposing (..)
 import Browser.Navigation as Nav
 import Components
 import Element exposing (..)
+import ExamplePalette
 import Html exposing (Html)
 import Lorem
+import Palette exposing (Palette)
 import Palette.Editor as Palette exposing (PaletteEditor)
-import Palette.Palette as Palette exposing (Palette)
 import Url
 import Url.Parser exposing ((</>), Parser, int, map, oneOf, s, string)
 
@@ -65,7 +66,7 @@ init : Flags -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
     let
         palette =
-            Palette.default
+            ExamplePalette.palette
     in
     ( { key = key
       , url = url

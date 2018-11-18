@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+BIN_DIR=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
+PROJECT_DIR="$(dirname "$BIN_DIR")"
+EXAMPLE_DIR="$PROJECT_DIR/examples"
+
+pushd $EXAMPLE_DIR
+
+elm-live $EXAMPLE_DIR/src/Main.elm -- --output $EXAMPLE_DIR/elm.js & \
+fswatch -0 ~/Downloads/ | xargs -0 -n 1 -I {} ./livepalette.sh
+
+popd

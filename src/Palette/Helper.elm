@@ -1,7 +1,7 @@
 module Palette.Helper exposing (FontRatio, black, contrastRatio, fontColor, goldenRatio, largeFontSize, majorSixth, mediumFontSize, perfectFifth, perfectFourth, relativeLuminance, smallFontSize, threshold, white, xLargeFontSize, xSmallFontSize, xxLargeFontSize)
 
 import Element exposing (..)
-import Palette.Palette as Palette exposing (Palette)
+import Palette exposing (Palette)
 
 
 

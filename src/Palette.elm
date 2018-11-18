@@ -1,4 +1,4 @@
-module Palette.Palette exposing (..)
+module Palette exposing (FontRatio, Palette, default, goldenRatio, perfectFifth)
 
 import Element exposing (..)
 
