@@ -209,7 +209,7 @@ viewExpanded paletteEditor =
         , scrollbarY
         , Border.color black
         , Border.shadow { offset = ( 2, 2 ), size = 1, blur = 2, color = rgb 0 0 0 }
-        , Background.color (rgba 1 1 1 0.7)
+        , Background.color (rgba 1 1 1 0.8)
         , clip
         ]
         (column [ height (px 400) ]
@@ -261,20 +261,22 @@ viewMinimizeButton =
 viewSelectors : PaletteEditor -> Element Msg
 viewSelectors paletteEditor =
     column [ width fill, height fill, padding 10, spacing 20, scrollbars ]
-        [ -- font
-          viewFontSizeSelector paletteEditor
-        , viewFontRatioSelector paletteEditor
-
-        -- layout
-        , viewPaddingSelector paletteEditor
-        , viewSpacingSelector paletteEditor
-
-        -- colors
-        , row [] [ text "Color Scheme" ]
+        [ -- colors
+          row [ Font.heavy ] [ text "Color Scheme" ]
         , viewShadowColorSelector paletteEditor
         , viewMidtoneColorSelector paletteEditor
         , viewHighlightColorSelector paletteEditor
         , viewAccentColorSelector paletteEditor
+
+        -- font
+        , row [ Font.heavy ] [ text "Font" ]
+        , viewFontSizeSelector paletteEditor
+        , viewFontRatioSelector paletteEditor
+
+        -- layout
+        , row [ Font.heavy ] [ text "Layout" ]
+        , viewPaddingSelector paletteEditor
+        , viewSpacingSelector paletteEditor
 
         -- save
         , viewSaveButton paletteEditor
